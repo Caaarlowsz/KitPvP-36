@@ -1,0 +1,5 @@
+name: KitPvP
+main: ru.mclegendary.kitpvp.KitPvP
+version: '6.6'
+description: 'Plugin for some stuff on KitPvP :)'
+softdepend: [PlaceholderAPI]

@@ -1,0 +1,9 @@
+MySQL:
+  Host: localhost
+  Port: '3306'
+  Database:
+    Name: database
+    Table: kitpvp_stats
+  UseSSL: 'false'
+  Username: user
+  Password: password
