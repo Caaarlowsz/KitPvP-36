@@ -1,9 +1,13 @@
 MySQL:
   Host: localhost
-  Port: '3306'
+  Port: 3306
   Database:
     Name: database
     Table: kitpvp_stats
-  UseSSL: 'false'
+  UseSSL: false
   Username: user
   Password: password
+  Max-Pool-Size: 7
+  Min-Pool-Idle: 10
+  Max-Pool-Lifetime: 1800000
+  Max-Pool-Timeout: 5000

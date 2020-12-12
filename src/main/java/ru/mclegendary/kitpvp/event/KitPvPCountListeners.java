@@ -12,7 +12,7 @@ public class KitPvPCountListeners implements Listener {
 
     @EventHandler
     public void onPlayerJoin(PlayerJoinEvent e) {
-        getMain().data.createPlayer(e.getPlayer());
+        getMain().getSQLManager().createPlayer(e.getPlayer());
     }
 
     @EventHandler
@@ -22,10 +22,10 @@ public class KitPvPCountListeners implements Listener {
 
         if (victim == null) return;
 
-        getMain().data.addDeaths(victim.getUniqueId(), 1);
+        getMain().getSQLManager().addDeaths(victim.getUniqueId(), 1);
 
         if (killer != null) {
-            getMain().data.addKills(killer.getUniqueId(), 1);
+            getMain().getSQLManager().addKills(killer.getUniqueId(), 1);
         }
     }
 }

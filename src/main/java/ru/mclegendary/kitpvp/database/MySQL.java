@@ -1,52 +1,68 @@
 package ru.mclegendary.kitpvp.database;
 
-import org.bukkit.ChatColor;
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.File;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import static ru.mclegendary.kitpvp.KitPvP.getMain;
 
 public class MySQL {
-    private final FileConfiguration config = YamlConfiguration.loadConfiguration(new File(getMain().getDataFolder(), "config.yml"));
+    private final HikariDataSource hikari;
 
-    private final String host = config.getString("MySQL.Host");
-    private final String port = config.getString("MySQL.Port");
-    private final String database = config.getString("MySQL.Database.Name");
-    private final String useSSL = config.getString("MySQL.UseSSL");
-    private final String username = config.getString("MySQL.Username");
-    private final String password = config.getString("MySQL.Password");
+    public MySQL() {
+        final FileConfiguration config = YamlConfiguration.loadConfiguration(getMain().getConfigFile());
+        HikariConfig hikariConfig = new HikariConfig();
 
-    private Connection connection;
+        final String host = config.getString("MySQL.Host");
+        final int port = config.getInt("MySQL.Port");
+        final String database = config.getString("MySQL.Database.Name");
+        final boolean useSSL = config.getBoolean("MySQL.UseSSL");
+        final String username = config.getString("MySQL.Username");
+        final String password = config.getString("MySQL.Password");
 
-    public boolean isConnected() {
-        return (connection != null);
+        final int maxPoolSize = config.getInt("MySQL.Max-Pool-Size");
+        final int minPoolIdle = config.getInt("MySQL.Min-Pool-Idle");
+        final int maxPoolLifetime = config.getInt("MySQL.Max-Pool-Lifetime");
+        final int maxPoolTimeout = config.getInt("MySQL.Max-Pool-Timeout");
+
+
+        hikariConfig.setMaximumPoolSize(maxPoolSize);
+        hikariConfig.setMinimumIdle(minPoolIdle);
+        hikariConfig.setMaxLifetime(maxPoolLifetime);
+        hikariConfig.setConnectionTimeout(maxPoolTimeout);
+
+        hikariConfig.setPoolName("JustStats MySQL Connection Pool");
+        hikariConfig.setDataSourceClassName("com.mysql.jdbc.jdbc2.optional.MysqlDataSource");
+
+        hikariConfig.addDataSourceProperty("serverName", host);
+        hikariConfig.addDataSourceProperty("port", port);
+        hikariConfig.addDataSourceProperty("databaseName", database);
+        hikariConfig.addDataSourceProperty("user", username);
+        hikariConfig.addDataSourceProperty("password", password);
+        hikariConfig.addDataSourceProperty("useSSL", useSSL);
+
+        this.hikari = new HikariDataSource(hikariConfig);
     }
 
-    public void connect() throws ClassNotFoundException, SQLException {
-        if (isConnected()) {
-            getMain().getLogger().info(ChatColor.RED + "Database is already connected!");
-            return;
-        }
+    public final boolean isConnected() { return hikari != null && hikari.isRunning(); }
 
-        connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/" + database + "?useSSL=" + useSSL, username, password);
-    }
+    public HikariDataSource getHikari() { return hikari; }
+
+    public Connection getConnection() throws SQLException { return hikari.getConnection(); }
 
     public void disconnect() {
         if (isConnected()) {
             try {
-                connection.close();
+                hikari.getConnection().close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public Connection getConnection() {
-        return connection;
-    }
 }

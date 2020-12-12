@@ -41,7 +41,7 @@ public class KTPExpansion extends PlaceholderExpansion {
     public String onPlaceholderRequest(Player player, String params) {
         if (player == null) return (ChatColor.RED + "Игрок не найден.");
 
-        SQLManager data = getMain().data;
+        SQLManager data = getMain().getSQLManager();
         UUID playerUUID = player.getUniqueId();
 
         switch (params) {

@@ -14,17 +14,21 @@ import ru.mclegendary.kitpvp.placeholder.KTPExpansion;
 public class KitPvP extends JavaPlugin {
     private static KitPvP main;
 
-    public SQLManager data;
-    public MySQL sql;
+    private SQLManager data;
+    private MySQL sql;
+
+    private File configFile;
 
     @Override
     public void onEnable() {
         // Main start
         main = this;
 
-        configSetup();
         placeholdersSetup();
         getLogger().info(ChatColor.DARK_PURPLE + "I'm in danger :(");
+
+        // Config
+        this.configFile = new File(this.getDataFolder(), "config.yml");
 
         // MySQL
         this.sql = new MySQL();
@@ -37,14 +41,16 @@ public class KitPvP extends JavaPlugin {
     public static KitPvP getMain() {
         return main;
     }
+    public File getConfigFile() { return configFile; }
     public SQLManager getSQLManager() {
         return data;
     }
+    public MySQL getSQL() { return sql; }
 
     public void connectionSetup() {
         try {
-            sql.connect();
-        } catch (ClassNotFoundException | SQLException e) {
+            sql.getConnection();
+        } catch (SQLException e) {
             getLogger().info(ChatColor.DARK_RED + "Something went wrong with connection to database!");
         }
 
@@ -65,14 +71,6 @@ public class KitPvP extends JavaPlugin {
         }
 
         new KTPExpansion().register();
-    }
-
-    public void configSetup() {
-        if (new File(this.getDataFolder(), "config.yml").exists()) {
-            return;
-        }
-
-        this.saveResource("config.yml", false);
     }
 
     @Override
